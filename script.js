@@ -143,10 +143,18 @@ function toggleMute() {
 
 function updateRangeVal(val) {
     const display = document.getElementById('rangeVal');
-    display.innerText = parseFloat(val) === 0.5 ? "30 Seconds" : `${val} Minutes`;
-    if (!timerId) document.getElementById('timerDisplay').innerText = formatTime(val * 60);
+    
+    // Clear the text first, then set it correctly
+    if (parseFloat(val) === 0.5) {
+        display.innerText = "30 Seconds";
+    } else {
+        display.innerText = `${val} Minutes`;
+    }
+    
+    if (!timerId) {
+        document.getElementById('timerDisplay').innerText = formatTime(val * 60);
+    }
 }
-
 function closeTimer() {
     document.getElementById('timerOverlay').classList.add('hidden');
     clearInterval(timerId); timerId = null; timeLeft = null;
