@@ -1,0 +1,7 @@
+body { font-family: sans-serif; background: #e8f5e9; display: flex; justify-content: center; padding: 40px; }
+.container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+.tree-container { font-size: 80px; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; transition: transform 0.3s ease; }
+input { padding: 8px; width: 70%; border: 1px solid #ccc; border-radius: 5px; }
+button { padding: 8px; cursor: pointer; background: #2e7d32; color: white; border: none; border-radius: 5px; }
+ul { list-style: none; padding: 0; text-align: left; margin-top: 20px; }
+li { padding: 8px; border-bottom: 1px solid #eee; }
