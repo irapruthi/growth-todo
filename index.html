@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenGarden | Deep Work</title>
+    <title>ZenGarden | Deep Work Ecosystem</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
+    <div id="gardenCanvas" class="garden-canvas"></div>
+
     <div class="glass-container">
         <nav>
             <div class="logo">🌿 ZenGarden</div>
@@ -15,31 +18,20 @@
                 <span id="muteBtn" onclick="toggleMute()" style="cursor:pointer; margin-right:10px;">🔊</span>
                 <span id="totalTime">0h 0m</span>
                 <div class="divider"></div>
-                <span id="treeCount">0 Plants</span>
+                <span id="treeCount">0 Plots</span>
             </div>
         </nav>
 
         <div class="input-area">
-            <input type="text" id="taskInput" placeholder="What will you grow?">
-            <button class="plant-btn" onclick="addTask()">Plant Seed</button>
+            <input type="text" id="taskInput" placeholder="What will you plant?">
+            <button class="plant-btn" onclick="plantSeed()">Plant Seed</button>
         </div>
 
         <div class="scroll-area">
-            <div id="taskList"></div>
-            
-            <section class="forest-display">
-                <div class="section-header">
-                    <h3>Your Living Forest</h3>
-                </div>
-                <div id="gallery" class="aesthetic-grid"></div>
-            </section>
-
-            <section class="badges-display">
-                <h3>Achievements</h3>
-                <div id="badgeContainer" class="badge-flex"></div>
-            </section>
+            <h3>Active Seeds (Tasks)</h3>
+            <ul id="taskList"></ul>
         </div>
-
+        
         <div class="wave-container">
             <div id="dynamicWave" class="wave"></div>
         </div>
@@ -49,10 +41,10 @@
         <div class="blur-bg"></div>
         <div class="modal">
             <div class="growth-circle">
-                <div id="tree-emoji">🌑</div>
+                <div id="tree-emoji">🌱</div>
             </div>
             <h2 id="activeTaskName">Focusing...</h2>
-            <div id="timerDisplay">00:00:30</div>
+            <div id="timerDisplay">00:25:00</div>
             
             <div class="time-selector">
                 <input type="range" id="minutesInput" min="0.5" max="120" step="0.5" value="25" oninput="updateRangeVal(this.value)">
