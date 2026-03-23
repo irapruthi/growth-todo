@@ -1,9 +1,11 @@
 🌿 ZenGarden: Deep Work Ecosystem
 ZenGarden is a gamified productivity tool that transforms your focus time into a living, breathing digital garden. Unlike traditional to-do lists, every task you plant starts as a seed in a vast soil grid. As you complete your deep work sessions, your background evolves from barren earth into a lush landscape of flowers, fruits, and exotic plants.
 
-Preview link:https://irapruthi.github.io/growth-todo/
+**Preview link:** https://irapruthi.github.io/growth-todo/
+
 
  Key Features
+
 🌱 Interactive Planting: Adding a task "plants" a seed in a specific plot on your background grid.
 
  Evolutionary Timer: Watch your seed grow through 7 stages—from a New Moon 🌑 to a Full Tree 🌳—in real-time as the timer counts down.
