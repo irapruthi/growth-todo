@@ -31,7 +31,7 @@ body {
     padding: 25px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* This keeps the wave inside the box */
 }
 
 nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; z-index: 10; }
@@ -42,7 +42,7 @@ nav { display: flex; justify-content: space-between; align-items: center; margin
 input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; font-family: inherit; }
 .plant-btn { background: var(--accent); border: none; border-radius: 12px; padding: 0 18px; color: #081c15; font-weight: 700; cursor: pointer; }
 
-.scroll-area { flex: 1; overflow-y: auto; z-index: 5; padding-right: 8px; }
+.scroll-area { flex: 1; overflow-y: auto; z-index: 5; padding-right: 8px; position: relative; }
 .scroll-area::-webkit-scrollbar { width: 4px; }
 .scroll-area::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
@@ -50,6 +50,7 @@ input { background: transparent; border: none; color: white; padding: 12px; flex
     background: rgba(255,255,255,0.06);
     margin-bottom: 12px; padding: 15px; border-radius: 20px;
     display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    position: relative; z-index: 10;
 }
 .task-text { flex: 1; cursor: pointer; font-weight: 500; }
 .delete-btn { 
@@ -58,7 +59,6 @@ input { background: transparent; border: none; color: white; padding: 12px; flex
     color: var(--danger); cursor: pointer; font-weight: bold;
 }
 
-/* Garden Neon Glow */
 .aesthetic-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
     gap: 12px; padding: 18px; background: rgba(0,0,0,0.25); border-radius: 22px;
@@ -69,18 +69,22 @@ input { background: transparent; border: none; color: white; padding: 12px; flex
     animation: float 4s infinite ease-in-out;
 }
 
-/* Animated Wave */
+/* --- FIXED WAVE CSS --- */
 .wave-container {
     position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 120px;
-    z-index: 1; pointer-events: none;
+    bottom: 0; left: 0; 
+    width: 100%; height: 150px; /* Limit height */
+    z-index: 1; 
+    pointer-events: none;
     opacity: 0.3;
 }
 .wave {
-    position: absolute; bottom: -60px; left: -50%;
-    width: 200%; height: 220px;
+    position: absolute; 
+    bottom: -110px; /* Push it down so only the top curves show */
+    left: -50%;
+    width: 200%; height: 250px;
     background: var(--accent);
-    border-radius: 42%;
+    border-radius: 38%; /* Creates the liquid look when rotating */
     animation: waveRotation 12s infinite linear;
 }
 
