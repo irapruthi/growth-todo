@@ -1,43 +1,68 @@
-// Database Init
-let state = JSON.parse(localStorage.getItem('aestheticZenData')) || {
+// Database Initialization with Error Handling
+let state = {
     totalMinutes: 0,
     forest: [],
     badges: [],
     tasks: []
 };
 
+// Load from LocalStorage
+const savedData = localStorage.getItem('aestheticZenData');
+if (savedData) {
+    state = JSON.parse(savedData);
+}
+
 let timerId = null;
 let timeLeft = null;
 let activeId = null;
 
-// The Evolutionary Lineup
 const stages = ["🌱", "🌿", "🎋", "🌳"];
 const rewards = {
-    short: ["🌸", "🌼", "🌻", "🌺"], // Under 20 mins
-    medium: ["🌳", "🌲", "🌴", "🍀"], // 20-50 mins
-    long: ["🍎", "🍋", "🍇", "🍒", "🍑"], // Over 50 mins
-    rare: ["🌵", "🍄", "🌹", "💎"] // Random chance
+    short: ["🌸", "🌼", "🌻", "🌺"],
+    medium: ["🌳", "🌲", "🌴", "🍀"],
+    long: ["🍎", "🍋", "🍇", "🍒", "🍑"],
+    rare: ["🌵", "🍄", "🌹", "💎"]
 };
 
-window.onload = () => { renderUI(); renderTasks(); };
+// Run as soon as page loads
+window.onload = () => { 
+    renderUI(); 
+    renderTasks(); 
+};
 
-function updateRangeVal(val) { document.getElementById('rangeVal').innerText = val; }
+function save() { 
+    localStorage.setItem('aestheticZenData', JSON.stringify(state)); 
+}
 
 function addTask() {
-    const val = document.getElementById('taskInput').value;
-    if(!val) return;
-    state.tasks.push({id: Date.now(), name: val});
-    document.getElementById('taskInput').value = "";
+    const inputField = document.getElementById('taskInput');
+    const taskName = inputField.value.trim();
+    
+    if (taskName === "") {
+        alert("Please enter a task name first!");
+        return;
+    }
+
+    // Add to state
+    state.tasks.push({
+        id: Date.now(), 
+        name: taskName
+    });
+
+    // Clear input and update
+    inputField.value = "";
     save();
     renderTasks();
 }
 
 function renderTasks() {
     const list = document.getElementById('taskList');
+    if (!list) return;
+    
     list.innerHTML = state.tasks.map(t => `
-        <li onclick="openTimer(${t.id}, '${t.name}')">
+        <li onclick="openTimer(${t.id}, '${t.name.replace(/'/g, "\\'")}')">
             <span>${t.name}</span>
-            <span style="opacity:0.4">→</span>
+            <span style="opacity:0.4">Start →</span>
         </li>
     `).join('');
 }
@@ -46,38 +71,59 @@ function openTimer(id, name) {
     activeId = id;
     document.getElementById('activeTaskName').innerText = name;
     document.getElementById('timerOverlay').classList.remove('hidden');
+    
+    // Reset timer display to default chosen value
+    const initialMins = document.getElementById('minutesInput').value;
+    document.getElementById('timerDisplay').innerText = `${initialMins}:00`;
+    timeLeft = null; // Reset time left so it calculates fresh
+}
+
+function updateRangeVal(val) { 
+    document.getElementById('rangeVal').innerText = val; 
+    document.getElementById('timerDisplay').innerText = `${val}:00`;
 }
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const totalMins = parseInt(document.getElementById('minutesInput').value);
     
-    if(timerId) {
+    if (timerId) {
         clearInterval(timerId);
         timerId = null;
-        btn.innerText = "Resume";
+        btn.innerText = "Resume Growth";
     } else {
-        if(!timeLeft) timeLeft = totalMins * 60;
-        btn.innerText = "Focusing...";
+        if (!timeLeft) timeLeft = totalMins * 60;
+        btn.innerText = "Pause";
+        
         timerId = setInterval(() => {
+            if (timeLeft <= 0) {
+                finish(totalMins);
+                return;
+            }
             timeLeft--;
-            const progress = (totalMins * 60 - timeLeft) / (totalMins * 60);
-            document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
-            
-            // Evolution
-            const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
-            document.getElementById('tree-emoji').innerText = stages[stageIdx];
-            
-            if(timeLeft <= 0) finish(totalMins);
+            updateTimerView(totalMins);
         }, 1000);
     }
 }
 
+function updateTimerView(totalMins) {
+    // Update Clock
+    let m = Math.floor(timeLeft / 60);
+    let s = timeLeft % 60;
+    document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    
+    // Update Stage
+    const progress = (totalMins * 60 - timeLeft) / (totalMins * 60);
+    const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
+    document.getElementById('tree-emoji').innerText = stages[stageIdx];
+}
+
 function finish(mins) {
     clearInterval(timerId);
+    timerId = null;
     state.totalMinutes += mins;
     
-    // Determine Reward Type
+    // Reward logic
     let pool = rewards.medium;
     if(mins < 20) pool = rewards.short;
     if(mins >= 50) pool = rewards.long;
@@ -85,34 +131,34 @@ function finish(mins) {
 
     const prize = pool[Math.floor(Math.random() * pool.length)];
     state.forest.push(prize);
+    
+    // Remove the task
     state.tasks = state.tasks.filter(t => t.id !== activeId);
     
-    // Stats Update
-    if(state.totalMinutes >= 60 && !state.badges.includes("🏆 Hour Club")) state.badges.push("🏆 Hour Club");
-    
-    timeLeft = null;
-    timerId = null;
     save();
     renderUI();
     renderTasks();
     closeTimer();
-    alert(`Beautiful! You've grown a ${prize}`);
+    alert(`Success! You grew a ${prize}`);
+    timeLeft = null;
 }
 
 function renderUI() {
-    const hrs = Math.floor(state.totalMinutes/60);
+    const hrs = Math.floor(state.totalMinutes / 60);
     const mins = state.totalMinutes % 60;
     document.getElementById('totalTime').innerText = `${hrs}h ${mins}m`;
     document.getElementById('treeCount').innerText = `${state.forest.length} Plants`;
-    document.getElementById('gallery').innerHTML = state.forest.map(f => `<span class="mini-tree">${f}</span>`).join('');
-    document.getElementById('badgeContainer').innerHTML = state.badges.map(b => `<span class="badge">${b}</span>`).join('');
+    
+    const gallery = document.getElementById('gallery');
+    if (gallery) {
+        gallery.innerHTML = state.forest.map(f => `<span class="mini-tree">${f}</span>`).join('');
+    }
 }
 
-function formatTime(sec) {
-    let m = Math.floor(sec/60);
-    let s = sec%60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+function closeTimer() { 
+    document.getElementById('timerOverlay').classList.add('hidden'); 
+    if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+    }
 }
-
-function save() { localStorage.setItem('aestheticZenData', JSON.stringify(state)); }
-function closeTimer() { document.getElementById('timerOverlay').classList.add('hidden'); }
