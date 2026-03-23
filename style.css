@@ -4,7 +4,7 @@
     --accent: #74c69d;
     --text: #d8f3dc;
     --danger: #ff5a5f;
-    --glow: 0 0 12px rgba(116, 198, 157, 0.6);
+    --glow: 0 0 15px rgba(116, 198, 157, 0.8);
 }
 
 body {
@@ -31,15 +31,13 @@ body {
     padding: 25px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
     position: relative;
-    overflow: hidden; /* Clips the wave */
+    overflow: hidden;
 }
 
-/* Nav & Stats */
 nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; z-index: 10; }
 .main-stats { background: rgba(0,0,0,0.4); padding: 10px 18px; border-radius: 50px; display: flex; align-items: center; font-size: 0.85rem; }
 .divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); margin: 0 10px; }
 
-/* Inputs & Tasks */
 .input-area { background: rgba(255,255,255,0.05); border-radius: 18px; padding: 5px; display: flex; margin-bottom: 20px; z-index: 10; }
 input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; font-family: inherit; }
 .plant-btn { background: var(--accent); border: none; border-radius: 12px; padding: 0 18px; color: #081c15; font-weight: 700; cursor: pointer; }
@@ -60,29 +58,29 @@ input { background: transparent; border: none; color: white; padding: 12px; flex
     color: var(--danger); cursor: pointer; font-weight: bold;
 }
 
-/* Garden & Neon Glow */
+/* Garden Neon Glow */
 .aesthetic-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
     gap: 12px; padding: 18px; background: rgba(0,0,0,0.25); border-radius: 22px;
 }
 .mini-tree { 
     font-size: 1.6rem; text-align: center; 
-    filter: drop-shadow(var(--glow)); /* Neon Glow */
+    filter: drop-shadow(var(--glow));
     animation: float 4s infinite ease-in-out;
 }
 
 /* Animated Wave */
 .wave-container {
     position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 100px;
+    bottom: 0; left: 0; width: 100%; height: 120px;
     z-index: 1; pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.3;
 }
 .wave {
-    position: absolute; bottom: -50px; left: -50%;
-    width: 200%; height: 200px;
+    position: absolute; bottom: -60px; left: -50%;
+    width: 200%; height: 220px;
     background: var(--accent);
-    border-radius: 40%;
+    border-radius: 42%;
     animation: waveRotation 12s infinite linear;
 }
 
@@ -93,7 +91,6 @@ input { background: transparent; border: none; color: white; padding: 12px; flex
 
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-/* Modal */
 #timerOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 3000; }
 .blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(12px); }
 .modal { position: relative; background: #122919; width: 290px; padding: 35px; border-radius: 35px; text-align: center; border: 1px solid var(--accent); }
