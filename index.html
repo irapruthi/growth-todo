@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grow Your Forest</title>
+    <title>Focus Forest</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Tree Tracker</h1>
+        <h1>Focus Forest</h1>
+        
         <div class="tree-container">
             <div id="tree-emoji">🌑</div>
         </div>
+
+        <div class="timer-display">
+            <span id="timer">25:00</span>
+            <button id="startBtn" onclick="toggleTimer()">Start Focus</button>
+        </div>
+
         <div class="todo-section">
-            <input type="text" id="taskInput" placeholder="Add a task...">
-            <button onclick="addTask()">Add</button>
+            <input type="text" id="taskInput" placeholder="Current task...">
             <ul id="taskList"></ul>
         </div>
     </div>
