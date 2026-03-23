@@ -1,48 +1,38 @@
-let timeLeft;
+let timeLeft = null; // Changed to null initially
 let timerId = null;
 let activeTask = null;
 const stages = ["🌱", "🌿", "🌳", "🌲", "🍎"];
 
-function addTask() {
-    const input = document.getElementById('taskInput');
-    if (!input.value) return;
-    
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span> <span>⏳</span>`;
-    li.onclick = () => openTimer(li, input.value);
-    document.getElementById('taskList').appendChild(li);
-    input.value = "";
-}
-
-function openTimer(element, name) {
-    if (element.classList.contains('completed')) return;
-    activeTask = element;
-    document.getElementById('activeTaskName').innerText = name;
-    document.getElementById('timerOverlay').classList.remove('hidden');
-}
-
-function closeTimer() {
-    clearInterval(timerId);
-    timerId = null;
-    document.getElementById('timerOverlay').classList.add('hidden');
-    document.getElementById('startBtn').innerText = "Start Growing";
-}
+// ... (keep your addTask and openTimer functions as they are)
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
+    const minsInput = document.getElementById('minutesInput');
+    const totalMins = parseInt(minsInput.value);
+
     if (timerId) {
+        // PAUSE LOGIC
         clearInterval(timerId);
         timerId = null;
-        btn.innerText = "Resume";
+        btn.innerText = "Resume Growing";
     } else {
-        const mins = document.getElementById('minutesInput').value;
-        if (!timeLeft) timeLeft = mins * 60;
+        // START/RESUME LOGIC
+        if (!timeLeft) {
+            timeLeft = totalMins * 60;
+        }
+        
         btn.innerText = "Pause";
         
+        // Run once immediately to set the display
+        updateTimerDisplay(totalMins);
+
         timerId = setInterval(() => {
             timeLeft--;
-            updateTimerDisplay(mins);
-            if (timeLeft <= 0) finishTask();
+            if (timeLeft <= 0) {
+                finishTask();
+            } else {
+                updateTimerDisplay(totalMins);
+            }
         }, 1000);
     }
 }
@@ -52,17 +42,30 @@ function updateTimerDisplay(totalMins) {
     const s = timeLeft % 60;
     document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
     
-    // Growth Logic
-    const percent = (totalMins * 60 - timeLeft) / (totalMins * 60);
-    const stage = Math.min(Math.floor(percent * stages.length), stages.length - 1);
-    document.getElementById('tree-emoji').innerText = stages[stage];
+    // Improved Growth Logic Calculation
+    const totalSeconds = totalMins * 60;
+    const elapsedSeconds = totalSeconds - timeLeft;
+    const progress = elapsedSeconds / totalSeconds;
+    
+    // Pick the stage based on percentage
+    const stageIndex = Math.min(Math.floor(progress * stages.length), stages.length - 1);
+    
+    const tree = document.getElementById('tree-emoji');
+    tree.innerText = stages[stageIndex];
+    // Add a little pop effect when it grows
+    tree.style.transform = `scale(${1 + (progress * 0.5)})`;
 }
 
 function finishTask() {
     clearInterval(timerId);
+    timerId = null;
     activeTask.classList.add('completed');
-    activeTask.innerHTML = `<span>${activeTask.firstChild.innerText}</span> <span>🌳 (Grown)</span>`;
-    alert("Task Grown!");
+    activeTask.innerHTML = `<span>${activeTask.querySelector('span').innerText}</span> <span>✅ Full Grown</span>`;
+    
+    // Reset for next task
     timeLeft = null;
+    alert("Congratulations! Your tree is fully grown!");
     closeTimer();
 }
+
+// ... (keep your closeTimer function)
