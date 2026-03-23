@@ -15,7 +15,6 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    /* Removed overflow: hidden so you can scroll on mobile if needed */
 }
 
 .glass-container {
@@ -23,93 +22,55 @@ body {
     backdrop-filter: blur(20px);
     width: 90%;
     max-width: 450px;
-    height: 85vh; /* Fixed height for the app */
+    height: 85vh;
     border-radius: 30px;
     border: 1px solid rgba(255,255,255,0.1);
     display: flex;
     flex-direction: column;
     padding: 25px;
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-    position: relative;
 }
 
-/* Header & Stats */
 nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
 .main-stats { background: rgba(0,0,0,0.4); padding: 10px 15px; border-radius: 50px; display: flex; align-items: center; font-size: 0.85rem; }
 .divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); margin: 0 10px; }
 
-/* Input Section */
 .input-area { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 5px; display: flex; margin-bottom: 20px; flex-shrink: 0; }
 input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; font-family: inherit; }
 .plant-btn { background: var(--accent); border: none; border-radius: 12px; padding: 0 15px; color: #081c15; font-weight: 700; cursor: pointer; }
 
-/* SCROLLABLE AREA */
-.scroll-area { 
-    flex: 1; 
-    overflow-y: auto; 
-    padding-right: 8px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent) transparent;
-}
-
-/* Custom Scrollbar for Chrome/Safari */
+.scroll-area { flex: 1; overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 .scroll-area::-webkit-scrollbar { width: 4px; }
 .scroll-area::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-/* TASK ITEMS - Fixed Visibility */
 .task-item {
-    background: rgba(255,255,255,0.05);
-    margin-bottom: 12px;
-    padding: 15px;
-    border-radius: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid rgba(255,255,255,0.1);
-    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    margin-bottom: 10px; padding: 12px 18px; border-radius: 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 15px;
 }
-
-.task-text { 
-    flex: 1; 
-    cursor: pointer; 
-    font-weight: 500; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-}
-
+.task-text { flex: 1; cursor: pointer; font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
 .delete-btn { 
-    background: rgba(255, 90, 95, 0.15); 
-    border: 1px solid var(--danger); 
-    color: var(--danger); 
-    padding: 6px 10px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-size: 0.7rem; 
-    font-weight: 700;
-    flex-shrink: 0; /* Prevents button from squishing */
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255, 90, 95, 0.1); border: 1px solid var(--danger);
+    color: var(--danger); cursor: pointer; font-weight: bold; flex-shrink: 0;
 }
 
-.delete-btn:hover { background: var(--danger); color: white; }
-
-/* Forest Gallery */
-.forest-display { margin-top: 25px; }
 .aesthetic-grid {
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
-    gap: 10px; 
-    padding: 15px; 
-    background: rgba(0,0,0,0.2); 
-    border-radius: 20px;
-    margin-bottom: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+    gap: 10px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 20px;
 }
-
 .mini-tree { font-size: 1.5rem; text-align: center; }
 
-/* MODAL FIX */
+.badge-flex { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.badge { background: linear-gradient(45deg, #ffca3a, #ff9f1c); color: #000; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
 #timerOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2000; }
 .blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); }
 .modal { position: relative; background: #1b4332; width: 280px; padding: 30px; border-radius: 30px; text-align: center; border: 1px solid var(--accent); }
+#tree-emoji { font-size: 80px; margin-bottom: 10px; }
 #timerDisplay { font-size: 3rem; font-weight: 300; margin: 15px 0; }
+.modal-actions { display: flex; flex-direction: column; gap: 8px; }
+.primary-btn { background: var(--accent); border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.secondary-btn { background: transparent; color: #aaa; border: none; cursor: pointer; }
 
 .hidden { display: none !important; }
