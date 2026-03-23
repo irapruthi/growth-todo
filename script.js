@@ -1,41 +1,96 @@
-let state = JSON.parse(localStorage.getItem('zenForestData')) || {
+// Database Init (ZenGarden Ecosystem Version)
+let state = JSON.parse(localStorage.getItem('zenEcosystemData')) || {
     totalSeconds: 0,
-    forest: [],
-    badges: [],
-    tasks: []
+    activeTasks: [],
+    completedPlots: {} // Map Plot ID -> Emoji
 };
 
 let timerId = null;
 let timeLeft = null;
-let activeId = null;
+let currentTaskRef = null;
 let isMuted = false;
 
-const audio = document.getElementById('zenAudio');
-const stages = ["🌑", "🌱", "🌿", "🪴", "🌿", "🎋", "🌳"];
-const rewards = {
-    flowers: ["🌸", "🌼", "🌻", "🌺", "🌹", "🌷", "🪷", "🏵️"],
-    trees: ["🌳", "🌲", "🌴", "🌵", "🎋", "🌿", "🍀", "🍄"],
-    fruits: ["🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒", "🍑", "🥭", "🍍"],
-    mythic: ["🌟", "✨", "💎", "🎋", "🎍", "🪴"]
-};
+// THE EXPANDED ICON LIBRARY
+const growthStages = ["🌑", "🌱", "🌿", "🪴", "🎋", "🌳"];
 
-const badgeTitles = [
-    { hrs: 1, title: "🌱 Sprout Scout" },
-    { hrs: 5, title: "🌿 Leaf Leader" },
-    { hrs: 10, title: "🌳 Grove Guardian" },
-    { hrs: 25, title: "🌲 Forest Overlord" },
-    { hrs: 50, title: "👑 Nature Deity" }
+const rewardPool = [
+    // --- FLOWERS ---
+    "🌸","🌼","🌻","🌺","🌹","🌷","🪷","🏵️","🌵",
+    // --- FRUITS (Including Watermelon & Persimmon) ---
+    "🍉","🍅","🍎","🍐","🍊","🍋","🍌","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🌽",
+    // --- RARE & EXOTIC ---
+    "🌳","🌲","🌴","🌵","🍄","🍀","🍁","🍂","🍃", "🎋", "🎍",
+    // --- SPECIAL REWARDS ---
+    "💎", "🌟", "✨", "🎐", "🏮"
 ];
 
-window.onload = () => { renderUI(); renderTasks(); };
+const audio = document.getElementById('zenAudio');
 
-function save() { localStorage.setItem('zenForestData', JSON.stringify(state)); }
+window.onload = () => {
+    generateGardenGrid();
+    renderUI();
+    renderTasks();
+};
 
-function addTask() {
+function save() { localStorage.setItem('zenEcosystemData', JSON.stringify(state)); }
+
+// --- THE GARDEN GRID GENERATOR ---
+function generateGardenGrid() {
+    const canvas = document.getElementById('gardenCanvas');
+    canvas.innerHTML = ''; 
+    
+    // Calculate plots based on screen size (60px plots)
+    const plotsX = Math.floor(window.innerWidth / 62);
+    const plotsY = Math.floor(window.innerHeight / 62);
+    const totalPlots = plotsX * plotsY;
+
+    for (let i = 0; i < totalPlots; i++) {
+        const plot = document.createElement('div');
+        plot.className = 'garden-plot';
+        plot.id = `plot-${i}`;
+
+        if (state.completedPlots[i]) {
+            plot.classList.add('grown');
+            plot.innerText = state.completedPlots[i];
+        }
+        canvas.appendChild(plot);
+    }
+}
+
+// --- TASK (SEED) MANAGEMENT ---
+function plantSeed() {
     const input = document.getElementById('taskInput');
     const name = input.value.trim();
     if (!name) return;
-    state.tasks.push({ id: Date.now(), name: name });
+
+    const plotsX = Math.floor(window.innerWidth / 62);
+    const plotsY = Math.floor(window.innerHeight / 62);
+    const maxPlots = plotsX * plotsY;
+    
+    let assignedPlotId = null;
+    for (let i = 0; i < maxPlots; i++) {
+        const isCompleted = state.completedPlots[i];
+        const isOccupiedByActiveTask = state.activeTasks.some(t => t.plotId === i);
+        
+        if (!isCompleted && !isOccupiedByActiveTask) {
+            assignedPlotId = i;
+            break;
+        }
+    }
+
+    if (assignedPlotId === null) {
+        alert("Your garden is full! Complete tasks to grow more.");
+        return;
+    }
+
+    state.activeTasks.push({
+        id: Date.now(),
+        name: name,
+        plotId: assignedPlotId
+    });
+
+    document.getElementById(`plot-${assignedPlotId}`).classList.add('has-seed');
+
     input.value = "";
     save();
     renderTasks();
@@ -43,25 +98,39 @@ function addTask() {
 
 function renderTasks() {
     const container = document.getElementById('taskList');
-    container.innerHTML = state.tasks.map(t => `
-        <div class="task-item">
-            <div class="task-text" onclick="openTimer(${t.id}, '${t.name.replace(/'/g, "\\'")}')">${t.name}</div>
-            <button class="delete-btn" onclick="deleteTask(${t.id})">×</button>
-        </div>
+    container.innerHTML = state.activeTasks.map(t => `
+        <li>
+            <div class="task-info" onclick="openTimer(${t.id}, '${t.name.replace(/'/g, "\\'")}')">
+                <strong>${t.name}</strong> 
+                <span style="opacity:0.5; font-size:0.8rem;"> (Plot ${t.plotId})</span>
+            </div>
+            <button class="delete-task-btn" onclick="deleteSeed(${t.id})">×</button>
+        </li>
     `).join('');
 }
 
-function deleteTask(id) {
-    if (timerId && activeId === id) return alert("Task is growing!");
-    state.tasks = state.tasks.filter(t => t.id !== id);
+function deleteSeed(id) {
+    if (timerId && currentTaskRef && currentTaskRef.id === id) {
+        alert("Cannot delete a task while it is growing!");
+        return;
+    }
+    const task = state.activeTasks.find(t => t.id === id);
+    if(task) {
+        document.getElementById(`plot-${task.plotId}`).classList.remove('has-seed');
+    }
+    state.activeTasks = state.activeTasks.filter(t => t.id !== id);
     save();
     renderTasks();
 }
 
+// --- TIMER & GROWTH ---
 function openTimer(id, name) {
-    activeId = id;
+    const task = state.activeTasks.find(t => t.id === id);
+    if (!task) return;
+    currentTaskRef = task;
     document.getElementById('activeTaskName').innerText = name;
     document.getElementById('timerOverlay').classList.remove('hidden');
+    
     const mins = parseFloat(document.getElementById('minutesInput').value);
     document.getElementById('timerDisplay').innerText = formatTime(mins * 60);
 }
@@ -76,7 +145,7 @@ function toggleTimer() {
         timerId = null;
         btn.innerText = "Resume Growth";
         audio.pause();
-        wave.style.animationDuration = "10s";
+        wave.style.animationDuration = "10s"; 
     } else {
         if (!timeLeft) timeLeft = totalSec;
         btn.innerText = "Pause";
@@ -85,18 +154,52 @@ function toggleTimer() {
         timerId = setInterval(() => {
             timeLeft--;
             document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
-            const progress = (totalSec - timeLeft) / totalSec;
             
-            // Speed up wave as time runs out
+            const progress = (totalSec - timeLeft) / totalSec;
             const newDuration = Math.max(2, 10 - (progress * 8));
             wave.style.animationDuration = `${newDuration}s`;
 
-            const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
-            document.getElementById('tree-emoji').innerText = stages[stageIdx];
+            const stageIdx = Math.min(Math.floor(progress * growthStages.length), growthStages.length - 1);
+            document.getElementById('tree-emoji').innerText = growthStages[stageIdx];
             
-            if (timeLeft <= 0) finish(totalSec);
+            if (timeLeft <= 0) finishGrowth(totalSec);
         }, 1000);
     }
+}
+
+function finishGrowth(secWorked) {
+    clearInterval(timerId);
+    timerId = null;
+    state.totalSeconds += secWorked;
+
+    // Pick a random prize from the expanded pool
+    const prize = rewardPool[Math.floor(Math.random() * rewardPool.length)];
+
+    const plotId = currentTaskRef.plotId;
+    state.completedPlots[plotId] = prize;
+
+    const plot = document.getElementById(`plot-${plotId}`);
+    plot.classList.remove('has-seed');
+    plot.classList.add('grown');
+    plot.innerText = prize;
+
+    state.activeTasks = state.activeTasks.filter(t => t.id !== currentTaskRef.id);
+
+    save();
+    renderUI();
+    renderTasks();
+    closeTimer();
+    timeLeft = null;
+    currentTaskRef = null;
+    document.getElementById('dynamicWave').style.animationDuration = "10s"; 
+}
+
+// --- UI HELPER FUNCTIONS ---
+function renderUI() {
+    const h = Math.floor(state.totalSeconds / 3600);
+    const m = Math.floor((state.totalSeconds % 3600) / 60);
+    document.getElementById('totalTime').innerText = `${h}h ${m}m`;
+    document.getElementById('treeCount').innerText = `${Object.keys(state.completedPlots).length} Plots`;
 }
 
 function formatTime(sec) {
@@ -104,35 +207,6 @@ function formatTime(sec) {
     const m = Math.floor((sec % 3600) / 60);
     const s = Math.floor(sec % 60);
     return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-}
-
-function finish(sec) {
-    clearInterval(timerId);
-    timerId = null;
-    state.totalSeconds += sec;
-    document.getElementById('dynamicWave').style.animationDuration = "10s";
-
-    let pool = (sec/60) < 5 ? rewards.flowers : ((sec/60) >= 30 ? rewards.fruits : rewards.trees);
-    if (Math.random() > 0.95) pool = rewards.mythic;
-    const prize = pool[Math.floor(Math.random() * pool.length)];
-    state.forest.push(prize);
-    state.tasks = state.tasks.filter(t => t.id !== activeId);
-    save(); renderUI(); renderTasks(); closeTimer();
-    alert(`Success! You've grown a ${prize}`);
-}
-
-function renderUI() {
-    const h = Math.floor(state.totalSeconds / 3600);
-    const m = Math.floor((state.totalSeconds % 3600) / 60);
-    document.getElementById('totalTime').innerText = `${h}h ${m}m`;
-    document.getElementById('treeCount').innerText = `${state.forest.length} Plants`;
-    document.getElementById('gallery').innerHTML = state.forest.map(f => `<span class="mini-tree">${f}</span>`).join('');
-    badgeTitles.forEach(b => {
-        const tag = `🎖️ ${b.title}`;
-        if (h >= b.hrs && !state.badges.includes(tag)) state.badges.push(tag);
-    });
-    document.getElementById('badgeContainer').innerHTML = state.badges.map(b => `<span class="badge">${b}</span>`).join('');
-    save();
 }
 
 function toggleMute() {
@@ -143,18 +217,8 @@ function toggleMute() {
 
 function updateRangeVal(val) {
     const display = document.getElementById('rangeVal');
-    const numVal = parseFloat(val);
-
-    // Overwrite the whole label to prevent "Seconds Minutes" overlap
-    if (numVal === 0.5) {
-        display.textContent = "30 Seconds";
-    } else {
-        display.textContent = val + " Minutes";
-    }
-    
-    if (!timerId) {
-        document.getElementById('timerDisplay').innerText = formatTime(numVal * 60);
-    }
+    display.innerText = parseFloat(val) === 0.5 ? "30 Seconds" : `${val} Minutes`;
+    if (!timerId) document.getElementById('timerDisplay').innerText = formatTime(val * 60);
 }
 
 function closeTimer() {
