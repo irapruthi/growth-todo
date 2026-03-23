@@ -1,6 +1,6 @@
 // State & LocalStorage
 let state = JSON.parse(localStorage.getItem('zenForestData')) || {
-    totalMinutes: 0,
+    totalSeconds: 0, // Changed to seconds for higher precision
     forest: [],
     badges: [],
     tasks: []
@@ -20,7 +20,14 @@ const rewards = {
     rare: ["🌵", "🍄", "🌹", "💎"] 
 };
 
-window.onload = () => { renderUI(); renderTasks(); };
+window.onload = () => { 
+    // Set slider step and min for 30s increments
+    const slider = document.getElementById('minutesInput');
+    slider.min = "0.5"; 
+    slider.step = "0.5";
+    renderUI(); 
+    renderTasks(); 
+};
 
 function save() { localStorage.setItem('zenForestData', JSON.stringify(state)); }
 
@@ -48,6 +55,7 @@ function renderTasks() {
 }
 
 function deleteTask(id) {
+    if (timerId && activeId === id) return alert("Cannot delete active task!");
     state.tasks = state.tasks.filter(t => t.id !== id);
     save();
     renderTasks();
@@ -57,14 +65,14 @@ function openTimer(id, name) {
     activeId = id;
     document.getElementById('activeTaskName').innerText = name;
     document.getElementById('timerOverlay').classList.remove('hidden');
-    const mins = document.getElementById('minutesInput').value;
-    document.getElementById('timerDisplay').innerText = `${mins}:00`;
+    const mins = parseFloat(document.getElementById('minutesInput').value);
+    document.getElementById('timerDisplay').innerText = formatTime(mins * 60);
 }
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const minsInput = document.getElementById('minutesInput');
-    const totalMins = parseInt(minsInput.value);
+    const totalSeconds = parseFloat(minsInput.value) * 60;
 
     if (timerId) {
         clearInterval(timerId);
@@ -72,60 +80,63 @@ function toggleTimer() {
         btn.innerText = "Resume Growth";
         audio.pause();
     } else {
-        if (!timeLeft) timeLeft = totalMins * 60;
+        if (!timeLeft) timeLeft = totalSeconds;
         btn.innerText = "Pause";
         if (!isMuted) audio.play();
 
         timerId = setInterval(() => {
             timeLeft--;
-            updateTimerView(totalMins);
-            if (timeLeft <= 0) finish(totalMins);
+            document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
+            
+            const progress = (totalSeconds - timeLeft) / totalSeconds;
+            const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
+            document.getElementById('tree-emoji').innerText = stages[stageIdx];
+
+            if (timeLeft <= 0) finish(totalSeconds);
         }, 1000);
     }
 }
 
-function updateTimerView(totalMins) {
-    let m = Math.floor(timeLeft / 60);
-    let s = timeLeft % 60;
-    document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-    
-    const progress = (totalMins * 60 - timeLeft) / (totalMins * 60);
-    const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
-    document.getElementById('tree-emoji').innerText = stages[stageIdx];
+function formatTime(totalSeconds) {
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = Math.floor(totalSeconds % 60);
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-function finish(mins) {
+function finish(secondsWorked) {
     clearInterval(timerId);
     timerId = null;
-    state.totalMinutes += mins;
+    state.totalSeconds += secondsWorked;
 
-    let pool = mins < 20 ? rewards.short : (mins >= 50 ? rewards.long : rewards.medium);
+    const mins = secondsWorked / 60;
+    let pool = mins < 10 ? rewards.short : (mins >= 45 ? rewards.long : rewards.medium);
     if (Math.random() > 0.9) pool = rewards.rare;
 
     const prize = pool[Math.floor(Math.random() * pool.length)];
     state.forest.push(prize);
     state.tasks = state.tasks.filter(t => t.id !== activeId);
 
-    // Badge Logic
-    const hrs = Math.floor(state.totalMinutes / 60);
-    if (hrs > 0 && !state.badges.includes(`🎖️ ${hrs} Hour Club`)) {
-        state.badges.push(`🎖️ ${hrs} Hour Club`);
-    }
-
     save();
     renderUI();
     renderTasks();
     closeTimer();
     timeLeft = null;
-    alert(`Amazing! You've grown a ${prize}`);
+    alert(`Success! Your garden gained a ${prize}`);
 }
 
 function renderUI() {
-    const hrs = Math.floor(state.totalMinutes / 60);
-    const mins = state.totalMinutes % 60;
-    document.getElementById('totalTime').innerText = `${hrs}h ${mins}m`;
+    const totalHrs = Math.floor(state.totalSeconds / 3600);
+    const totalMins = Math.floor((state.totalSeconds % 3600) / 60);
+    document.getElementById('totalTime').innerText = `${totalHrs}h ${totalMins}m`;
     document.getElementById('treeCount').innerText = `${state.forest.length} Plants`;
     document.getElementById('gallery').innerHTML = state.forest.map(f => `<span class="mini-tree">${f}</span>`).join('');
+    
+    // Achievement Logic
+    if (totalHrs > 0 && !state.badges.includes(`🎖️ ${totalHrs}h Master`)) {
+        state.badges.push(`🎖️ ${totalHrs}h Master`);
+        save();
+    }
     document.getElementById('badgeContainer').innerHTML = state.badges.map(b => `<span class="badge">${b}</span>`).join('');
 }
 
@@ -137,8 +148,9 @@ function toggleMute() {
 }
 
 function updateRangeVal(val) {
-    document.getElementById('rangeVal').innerText = val;
-    if (!timerId) document.getElementById('timerDisplay').innerText = `${val}:00`;
+    const displayVal = val < 1 ? "30 Seconds" : `${val} Minutes`;
+    document.getElementById('rangeVal').innerText = displayVal;
+    if (!timerId) document.getElementById('timerDisplay').innerText = formatTime(val * 60);
 }
 
 function closeTimer() {
