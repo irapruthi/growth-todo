@@ -129,9 +129,17 @@ function toggleMute() {
     if (isMuted) audio.pause(); else if (timerId) audio.play();
 }
 
+// FIXED LOGIC FOR 30 SECONDS TEXT
 function updateRangeVal(val) {
-    document.getElementById('rangeVal').innerText = val < 1 ? "30 Seconds" : `${val} Minutes`;
-    if (!timerId) document.getElementById('timerDisplay').innerText = formatTime(val * 60);
+    const display = document.getElementById('rangeVal');
+    if (parseFloat(val) === 0.5) {
+        display.innerText = "30 Seconds";
+    } else {
+        display.innerText = `${val} Minutes`;
+    }
+    if (!timerId) {
+        document.getElementById('timerDisplay').innerText = formatTime(val * 60);
+    }
 }
 
 function closeTimer() {
