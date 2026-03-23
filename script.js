@@ -1,8 +1,8 @@
-// Database Init (ZenGarden Ecosystem Version)
+// Database Init
 let state = JSON.parse(localStorage.getItem('zenEcosystemData')) || {
     totalSeconds: 0,
     activeTasks: [],
-    completedPlots: {} // Map Plot ID -> Emoji
+    completedPlots: {} 
 };
 
 let timerId = null;
@@ -16,11 +16,11 @@ const growthStages = ["🌑", "🌱", "🌿", "🪴", "🎋", "🌳"];
 const rewardPool = [
     // --- FLOWERS ---
     "🌸","🌼","🌻","🌺","🌹","🌷","🪷","🏵️","🌵",
-    // --- FRUITS (Including Watermelon & Persimmon) ---
+
     "🍉","🍅","🍎","🍐","🍊","🍋","🍌","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🌽",
-    // --- RARE & EXOTIC ---
+    
     "🌳","🌲","🌴","🌵","🍄","🍀","🍁","🍂","🍃", "🎋", "🎍",
-    // --- SPECIAL REWARDS ---
+    
     "💎", "🌟", "✨", "🎐", "🏮"
 ];
 
@@ -39,7 +39,7 @@ function generateGardenGrid() {
     const canvas = document.getElementById('gardenCanvas');
     canvas.innerHTML = ''; 
     
-    // Calculate plots based on screen size (60px plots)
+    // Calculate plots based on screen size
     const plotsX = Math.floor(window.innerWidth / 62);
     const plotsY = Math.floor(window.innerHeight / 62);
     const totalPlots = plotsX * plotsY;
@@ -57,7 +57,7 @@ function generateGardenGrid() {
     }
 }
 
-// --- TASK (SEED) MANAGEMENT ---
+// --- TASK MANAGEMENT ---
 function plantSeed() {
     const input = document.getElementById('taskInput');
     const name = input.value.trim();
@@ -194,7 +194,7 @@ function finishGrowth(secWorked) {
     document.getElementById('dynamicWave').style.animationDuration = "10s"; 
 }
 
-// --- UI HELPER FUNCTIONS ---
+// --- UI  FUNCTIONS ---
 function renderUI() {
     const h = Math.floor(state.totalSeconds / 3600);
     const m = Math.floor((state.totalSeconds % 3600) / 60);
