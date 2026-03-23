@@ -76,7 +76,7 @@ function toggleTimer() {
         timerId = null;
         btn.innerText = "Resume Growth";
         audio.pause();
-        wave.style.animationDuration = "12s";
+        wave.style.animationDuration = "10s";
     } else {
         if (!timeLeft) timeLeft = totalSec;
         btn.innerText = "Pause";
@@ -87,8 +87,8 @@ function toggleTimer() {
             document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
             const progress = (totalSec - timeLeft) / totalSec;
             
-            // Accelerate Wave Animation
-            const newDuration = Math.max(2, 12 - (progress * 10));
+            // Speed up wave as time runs out
+            const newDuration = Math.max(2, 10 - (progress * 8));
             wave.style.animationDuration = `${newDuration}s`;
 
             const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
@@ -110,7 +110,7 @@ function finish(sec) {
     clearInterval(timerId);
     timerId = null;
     state.totalSeconds += sec;
-    document.getElementById('dynamicWave').style.animationDuration = "12s";
+    document.getElementById('dynamicWave').style.animationDuration = "10s";
 
     let pool = (sec/60) < 5 ? rewards.flowers : ((sec/60) >= 30 ? rewards.fruits : rewards.trees);
     if (Math.random() > 0.95) pool = rewards.mythic;
@@ -143,22 +143,23 @@ function toggleMute() {
 
 function updateRangeVal(val) {
     const display = document.getElementById('rangeVal');
-    
-    // Clear the text first, then set it correctly
-    if (parseFloat(val) === 0.5) {
-        display.innerText = "30 Seconds";
+    const numVal = parseFloat(val);
+
+    // Overwrite the whole label to prevent "Seconds Minutes" overlap
+    if (numVal === 0.5) {
+        display.textContent = "30 Seconds";
     } else {
-        display.innerText = `${val} Minutes`;
+        display.textContent = val + " Minutes";
     }
     
     if (!timerId) {
-        document.getElementById('timerDisplay').innerText = formatTime(val * 60);
+        document.getElementById('timerDisplay').innerText = formatTime(numVal * 60);
     }
 }
+
 function closeTimer() {
     document.getElementById('timerOverlay').classList.add('hidden');
     clearInterval(timerId); timerId = null; timeLeft = null;
     audio.pause(); document.getElementById('startBtn').innerText = "Start Growth";
     document.getElementById('tree-emoji').innerText = "🌑";
-    document.getElementById('dynamicWave').style.animationDuration = "12s";
 }
