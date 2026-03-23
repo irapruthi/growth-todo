@@ -3,31 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Forest</title>
+    <title>Zen Forest | Deep Work</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🌳 Task Forest</h1>
+    <div class="app-container">
+        <header>
+            <h1>🌲 Zen Forest</h1>
+            <div class="stats">Trees Grown: <span id="treeCount">0</span></div>
+        </header>
         
-        <div class="input-group">
-            <input type="text" id="taskInput" placeholder="What will you grow today?">
-            <button onclick="addTask()">Add Seed</button>
+        <div class="input-card">
+            <input type="text" id="taskInput" placeholder="What's your next seed?">
+            <button class="add-btn" onclick="addTask()">Plant</button>
         </div>
 
         <ul id="taskList"></ul>
 
+        <div class="forest-floor">
+            <h3>Your Grown Forest</h3>
+            <div id="gallery" class="gallery"></div>
+        </div>
+
         <div id="timerOverlay" class="hidden">
             <div class="modal">
+                <div id="progressRing"></div>
                 <h2 id="activeTaskName">Task Name</h2>
-                <div id="tree-emoji">🌱</div>
+                <div id="tree-emoji" class="bounce">🌱</div>
                 <div id="timerDisplay">25:00</div>
-                <div class="controls">
-                    <input type="number" id="minutesInput" value="25" min="1" max="120">
+                <div class="timer-settings">
+                    <input type="number" id="minutesInput" value="25" min="1">
                     <span>mins</span>
                 </div>
-                <button id="startBtn" onclick="toggleTimer()">Start Growing</button>
-                <button class="cancel" onclick="closeTimer()">Cancel</button>
+                <div class="modal-buttons">
+                    <button id="startBtn" onclick="toggleTimer()">Start Growing</button>
+                    <button class="cancel-btn" onclick="closeTimer()">Give Up</button>
+                </div>
             </div>
         </div>
     </div>
