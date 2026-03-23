@@ -3,78 +3,113 @@
     --glass: rgba(255, 255, 255, 0.08);
     --accent: #74c69d;
     --text: #d8f3dc;
-    --danger: #ef4444;
+    --danger: #ff5a5f;
 }
 
 body {
     font-family: 'Quicksand', sans-serif;
     background: var(--bg-gradient);
     color: var(--text);
-    height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
-    overflow: hidden;
+    align-items: center;
+    min-height: 100vh;
+    /* Removed overflow: hidden so you can scroll on mobile if needed */
 }
 
 .glass-container {
     background: var(--glass);
     backdrop-filter: blur(20px);
-    width: 450px;
-    height: 90vh;
-    margin-top: 5vh;
-    border-radius: 40px;
+    width: 90%;
+    max-width: 450px;
+    height: 85vh; /* Fixed height for the app */
+    border-radius: 30px;
     border: 1px solid rgba(255,255,255,0.1);
     display: flex;
     flex-direction: column;
-    padding: 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    padding: 25px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    position: relative;
 }
 
-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.main-stats { background: rgba(0,0,0,0.3); padding: 8px 20px; border-radius: 50px; display: flex; align-items: center; }
-.divider { width: 1px; height: 15px; background: rgba(255,255,255,0.2); margin: 0 15px; }
+/* Header & Stats */
+nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
+.main-stats { background: rgba(0,0,0,0.4); padding: 10px 15px; border-radius: 50px; display: flex; align-items: center; font-size: 0.85rem; }
+.divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); margin: 0 10px; }
 
-.input-area { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 5px; display: flex; margin-bottom: 20px; }
-input { background: transparent; border: none; color: white; padding: 15px; flex: 1; outline: none; font-size: 1rem; }
-.plant-btn { background: var(--accent); border: none; border-radius: 15px; padding: 0 20px; color: #081c15; font-weight: 700; cursor: pointer; transition: 0.3s; }
-.plant-btn:hover { background: #95d5b2; }
+/* Input Section */
+.input-area { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 5px; display: flex; margin-bottom: 20px; flex-shrink: 0; }
+input { background: transparent; border: none; color: white; padding: 12px; flex: 1; outline: none; font-family: inherit; }
+.plant-btn { background: var(--accent); border: none; border-radius: 12px; padding: 0 15px; color: #081c15; font-weight: 700; cursor: pointer; }
 
-.scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; }
-.scroll-area::-webkit-scrollbar { width: 5px; }
-.scroll-area::-webkit-scrollbar-thumb { background: var(--glass); border-radius: 10px; }
+/* SCROLLABLE AREA */
+.scroll-area { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) transparent;
+}
 
-/* Task Items */
+/* Custom Scrollbar for Chrome/Safari */
+.scroll-area::-webkit-scrollbar { width: 4px; }
+.scroll-area::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+/* TASK ITEMS - Fixed Visibility */
 .task-item {
-    background: rgba(255,255,255,0.03);
-    margin: 10px 0; padding: 15px; border-radius: 20px;
-    display: flex; justify-content: space-between; align-items: center;
-    border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 12px;
+    padding: 15px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    gap: 10px;
 }
-.task-item:hover { background: rgba(255,255,255,0.08); }
-.task-text { flex: 1; cursor: pointer; font-weight: 500; }
-.delete-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 5px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
+
+.task-text { 
+    flex: 1; 
+    cursor: pointer; 
+    font-weight: 500; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.delete-btn { 
+    background: rgba(255, 90, 95, 0.15); 
+    border: 1px solid var(--danger); 
+    color: var(--danger); 
+    padding: 6px 10px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 0.7rem; 
+    font-weight: 700;
+    flex-shrink: 0; /* Prevents button from squishing */
+}
+
 .delete-btn:hover { background: var(--danger); color: white; }
 
-/* Forest Grid */
+/* Forest Gallery */
+.forest-display { margin-top: 25px; }
 .aesthetic-grid {
-    display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 12px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 25px; min-height: 80px;
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
+    gap: 10px; 
+    padding: 15px; 
+    background: rgba(0,0,0,0.2); 
+    border-radius: 20px;
+    margin-bottom: 20px;
 }
-.mini-tree { font-size: 1.8rem; text-align: center; animation: float 3s infinite ease-in-out; }
 
-/* Modal */
-#timerOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
-.modal { position: relative; background: #1b4332; width: 320px; padding: 40px; border-radius: 40px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--accent); }
-#tree-emoji { font-size: 100px; margin-bottom: 20px; }
-#timerDisplay { font-size: 4rem; font-weight: 300; margin-bottom: 20px; }
-.modal-actions { display: flex; flex-direction: column; gap: 10px; }
-.primary-btn { background: var(--accent); border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; }
-.secondary-btn { background: transparent; color: #aaa; border: none; padding: 10px; cursor: pointer; }
+.mini-tree { font-size: 1.5rem; text-align: center; }
 
-.badge-flex { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-.badge { background: #ffca3a; color: #000; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+/* MODAL FIX */
+#timerOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2000; }
+.blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); }
+.modal { position: relative; background: #1b4332; width: 280px; padding: 30px; border-radius: 30px; text-align: center; border: 1px solid var(--accent); }
+#timerDisplay { font-size: 3rem; font-weight: 300; margin: 15px 0; }
 
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .hidden { display: none !important; }
