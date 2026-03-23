@@ -3,6 +3,7 @@
     --glass: rgba(255, 255, 255, 0.08);
     --accent: #74c69d;
     --text: #d8f3dc;
+    --danger: #ef4444;
 }
 
 body {
@@ -27,47 +28,53 @@ body {
     display: flex;
     flex-direction: column;
     padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-/* Nav & Stats */
 nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.logo { font-weight: 700; font-size: 1.5rem; letter-spacing: -1px; }
-.main-stats { background: rgba(0,0,0,0.3); padding: 8px 20px; border-radius: 50px; font-size: 0.9rem; display: flex; gap: 15px; }
+.main-stats { background: rgba(0,0,0,0.3); padding: 8px 20px; border-radius: 50px; display: flex; align-items: center; }
+.divider { width: 1px; height: 15px; background: rgba(255,255,255,0.2); margin: 0 15px; }
 
-/* Input Styling */
-.input-area { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 5px; display: flex; }
-input { background: transparent; border: none; color: white; padding: 15px; flex: 1; outline: none; }
-.plant-btn { background: var(--accent); border: none; border-radius: 15px; padding: 0 20px; color: #081c15; font-weight: 700; cursor: pointer; }
+.input-area { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 5px; display: flex; margin-bottom: 20px; }
+input { background: transparent; border: none; color: white; padding: 15px; flex: 1; outline: none; font-size: 1rem; }
+.plant-btn { background: var(--accent); border: none; border-radius: 15px; padding: 0 20px; color: #081c15; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.plant-btn:hover { background: #95d5b2; }
 
-/* Tasks */
-#taskList li {
+.scroll-area { flex: 1; overflow-y: auto; padding-right: 5px; }
+.scroll-area::-webkit-scrollbar { width: 5px; }
+.scroll-area::-webkit-scrollbar-thumb { background: var(--glass); border-radius: 10px; }
+
+/* Task Items */
+.task-item {
     background: rgba(255,255,255,0.03);
-    margin: 15px 0; padding: 20px; border-radius: 20px;
-    list-style: none; display: flex; justify-content: space-between;
-    border: 1px solid rgba(255,255,255,0.05); cursor: pointer;
-    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin: 10px 0; padding: 15px; border-radius: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
 }
-#taskList li:hover { transform: translateX(10px); background: rgba(255,255,255,0.08); }
+.task-item:hover { background: rgba(255,255,255,0.08); }
+.task-text { flex: 1; cursor: pointer; font-weight: 500; }
+.delete-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 5px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
+.delete-btn:hover { background: var(--danger); color: white; }
 
-/* The Forest Grid */
+/* Forest Grid */
 .aesthetic-grid {
     display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 12px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 25px;
+    gap: 12px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 25px; min-height: 80px;
 }
-.mini-tree { font-size: 1.8rem; filter: drop-shadow(0 0 5px rgba(116, 198, 157, 0.3)); animation: float 3s infinite ease-in-out; }
+.mini-tree { font-size: 1.8rem; text-align: center; animation: float 3s infinite ease-in-out; }
 
 /* Modal */
-.modal {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #1b4332; width: 350px; padding: 40px; border-radius: 40px;
-    text-align: center; z-index: 1000; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-}
-#tree-emoji { font-size: 120px; margin-bottom: 20px; display: block; }
+#timerOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+.modal { position: relative; background: #1b4332; width: 320px; padding: 40px; border-radius: 40px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 1px solid var(--accent); }
+#tree-emoji { font-size: 100px; margin-bottom: 20px; }
 #timerDisplay { font-size: 4rem; font-weight: 300; margin-bottom: 20px; }
+.modal-actions { display: flex; flex-direction: column; gap: 10px; }
+.primary-btn { background: var(--accent); border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; }
+.secondary-btn { background: transparent; color: #aaa; border: none; padding: 10px; cursor: pointer; }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
+.badge-flex { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.badge { background: #ffca3a; color: #000; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
 
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .hidden { display: none !important; }
