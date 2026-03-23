@@ -69,21 +69,31 @@ function openTimer(id, name) {
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const totalSec = parseFloat(document.getElementById('minutesInput').value) * 60;
+    const wave = document.getElementById('dynamicWave');
+
     if (timerId) {
         clearInterval(timerId);
         timerId = null;
         btn.innerText = "Resume Growth";
         audio.pause();
+        wave.style.animationDuration = "12s";
     } else {
         if (!timeLeft) timeLeft = totalSec;
         btn.innerText = "Pause";
         if (!isMuted) audio.play();
+        
         timerId = setInterval(() => {
             timeLeft--;
             document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
             const progress = (totalSec - timeLeft) / totalSec;
+            
+            // Accelerate Wave Animation
+            const newDuration = Math.max(2, 12 - (progress * 10));
+            wave.style.animationDuration = `${newDuration}s`;
+
             const stageIdx = Math.min(Math.floor(progress * stages.length), stages.length - 1);
             document.getElementById('tree-emoji').innerText = stages[stageIdx];
+            
             if (timeLeft <= 0) finish(totalSec);
         }, 1000);
     }
@@ -100,6 +110,8 @@ function finish(sec) {
     clearInterval(timerId);
     timerId = null;
     state.totalSeconds += sec;
+    document.getElementById('dynamicWave').style.animationDuration = "12s";
+
     let pool = (sec/60) < 5 ? rewards.flowers : ((sec/60) >= 30 ? rewards.fruits : rewards.trees);
     if (Math.random() > 0.95) pool = rewards.mythic;
     const prize = pool[Math.floor(Math.random() * pool.length)];
@@ -129,17 +141,10 @@ function toggleMute() {
     if (isMuted) audio.pause(); else if (timerId) audio.play();
 }
 
-// FIXED LOGIC FOR 30 SECONDS TEXT
 function updateRangeVal(val) {
     const display = document.getElementById('rangeVal');
-    if (parseFloat(val) === 0.5) {
-        display.innerText = "30 Seconds";
-    } else {
-        display.innerText = `${val} Minutes`;
-    }
-    if (!timerId) {
-        document.getElementById('timerDisplay').innerText = formatTime(val * 60);
-    }
+    display.innerText = parseFloat(val) === 0.5 ? "30 Seconds" : `${val} Minutes`;
+    if (!timerId) document.getElementById('timerDisplay').innerText = formatTime(val * 60);
 }
 
 function closeTimer() {
@@ -147,4 +152,5 @@ function closeTimer() {
     clearInterval(timerId); timerId = null; timeLeft = null;
     audio.pause(); document.getElementById('startBtn').innerText = "Start Growth";
     document.getElementById('tree-emoji').innerText = "🌑";
+    document.getElementById('dynamicWave').style.animationDuration = "12s";
 }
