@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenGarden | Aesthetic Focus</title>
+    <title>ZenGarden | Deep Work</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -20,7 +20,7 @@
         </nav>
 
         <div class="input-area">
-            <input type="text" id="taskInput" placeholder="Plant a new goal...">
+            <input type="text" id="taskInput" placeholder="What will you grow?">
             <button class="plant-btn" onclick="addTask()">Plant Seed</button>
         </div>
 
@@ -39,7 +39,7 @@
                 <div id="badgeContainer" class="badge-flex"></div>
             </section>
         </div>
-        
+
         <div class="wave-container">
             <div id="dynamicWave" class="wave"></div>
         </div>
@@ -52,7 +52,7 @@
                 <div id="tree-emoji">🌑</div>
             </div>
             <h2 id="activeTaskName">Focusing...</h2>
-            <div id="timerDisplay">00:25:00</div>
+            <div id="timerDisplay">00:00:30</div>
             
             <div class="time-selector">
                 <input type="range" id="minutesInput" min="0.5" max="120" step="0.5" value="25" oninput="updateRangeVal(this.value)">
