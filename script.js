@@ -1,71 +1,83 @@
-let timeLeft = null; // Changed to null initially
-let timerId = null;
-let activeTask = null;
+let timeLeft, timerId, activeTask, totalTrees = 0;
+const treeTypes = ["🌳", "🌲", "🌴", "🌵", "🌿", "🍀", "🍁"];
 const stages = ["🌱", "🌿", "🌳", "🌲", "🍎"];
 
-// ... (keep your addTask and openTimer functions as they are)
+function addTask() {
+    const input = document.getElementById('taskInput');
+    if (!input.value.trim()) return;
+    
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${input.value}</strong> <span>Start →</span>`;
+    li.onclick = () => openTimer(li, input.value);
+    document.getElementById('taskList').appendChild(li);
+    input.value = "";
+}
+
+function openTimer(element, name) {
+    if (element.classList.contains('completed')) return;
+    activeTask = element;
+    document.getElementById('activeTaskName').innerText = name;
+    document.getElementById('timerOverlay').classList.remove('hidden');
+    document.body.style.background = "#1b4332"; // Dim the background
+}
+
+function closeTimer() {
+    clearInterval(timerId);
+    timerId = null;
+    timeLeft = null;
+    document.getElementById('timerOverlay').classList.add('hidden');
+    document.getElementById('startBtn').innerText = "Start Growing";
+    document.body.style.background = "#d8f3dc"; // Restore background
+}
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
-    const minsInput = document.getElementById('minutesInput');
-    const totalMins = parseInt(minsInput.value);
+    const mins = parseInt(document.getElementById('minutesInput').value);
 
     if (timerId) {
-        // PAUSE LOGIC
         clearInterval(timerId);
         timerId = null;
-        btn.innerText = "Resume Growing";
+        btn.innerText = "Resume";
     } else {
-        // START/RESUME LOGIC
-        if (!timeLeft) {
-            timeLeft = totalMins * 60;
-        }
+        if (!timeLeft) timeLeft = mins * 60;
+        btn.innerText = "Focusing...";
         
-        btn.innerText = "Pause";
-        
-        // Run once immediately to set the display
-        updateTimerDisplay(totalMins);
-
         timerId = setInterval(() => {
             timeLeft--;
-            if (timeLeft <= 0) {
-                finishTask();
-            } else {
-                updateTimerDisplay(totalMins);
-            }
+            updateDisplay(mins);
+            if (timeLeft <= 0) finishTask();
         }, 1000);
     }
 }
 
-function updateTimerDisplay(totalMins) {
+function updateDisplay(totalMins) {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
     document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
     
-    // Improved Growth Logic Calculation
-    const totalSeconds = totalMins * 60;
-    const elapsedSeconds = totalSeconds - timeLeft;
-    const progress = elapsedSeconds / totalSeconds;
-    
-    // Pick the stage based on percentage
+    const progress = (totalMins * 60 - timeLeft) / (totalMins * 60);
     const stageIndex = Math.min(Math.floor(progress * stages.length), stages.length - 1);
-    
-    const tree = document.getElementById('tree-emoji');
-    tree.innerText = stages[stageIndex];
-    // Add a little pop effect when it grows
-    tree.style.transform = `scale(${1 + (progress * 0.5)})`;
+    document.getElementById('tree-emoji').innerText = stages[stageIndex];
+    document.getElementById('tree-emoji').style.transform = `scale(${1 + progress})`;
 }
 
 function finishTask() {
     clearInterval(timerId);
-    timerId = null;
+    totalTrees++;
+    document.getElementById('treeCount').innerText = totalTrees;
+
+    // Mark task complete
     activeTask.classList.add('completed');
-    activeTask.innerHTML = `<span>${activeTask.querySelector('span').innerText}</span> <span>✅ Full Grown</span>`;
-    
-    // Reset for next task
-    timeLeft = null;
-    alert("Congratulations! Your tree is fully grown!");
+    activeTask.style.opacity = "0.5";
+    activeTask.innerHTML = `<span>${activeTask.querySelector('strong').innerText}</span> <span>✅ Grown</span>`;
+
+    // Add to Gallery
+    const gallery = document.getElementById('gallery');
+    const miniTree = document.createElement('span');
+    miniTree.className = "mini-tree";
+    miniTree.innerText = treeTypes[Math.floor(Math.random() * treeTypes.length)];
+    gallery.appendChild(miniTree);
+
+    alert("Task complete! A new tree has joined your forest.");
     closeTimer();
 }
-
-// ... (keep your closeTimer function)
