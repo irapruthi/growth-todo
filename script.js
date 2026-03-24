@@ -1,4 +1,4 @@
-// Database Init
+
 let state = JSON.parse(localStorage.getItem('zenEcosystemData')) || {
     totalSeconds: 0,
     activeTasks: [],
@@ -10,11 +10,9 @@ let timeLeft = null;
 let currentTaskRef = null;
 let isMuted = false;
 
-// THE EXPANDED ICON LIBRARY
 const growthStages = ["🌑", "🌱", "🌿", "🪴", "🎋", "🌳"];
 
 const rewardPool = [
-    // --- FLOWERS ---
     "🌸","🌼","🌻","🌺","🌹","🌷","🪷","🏵️","🌵",
 
     "🍉","🍅","🍎","🍐","🍊","🍋","🍌","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🌽",
@@ -34,12 +32,10 @@ window.onload = () => {
 
 function save() { localStorage.setItem('zenEcosystemData', JSON.stringify(state)); }
 
-// --- THE GARDEN GRID GENERATOR ---
 function generateGardenGrid() {
     const canvas = document.getElementById('gardenCanvas');
     canvas.innerHTML = ''; 
-    
-    // Calculate plots based on screen size
+
     const plotsX = Math.floor(window.innerWidth / 62);
     const plotsY = Math.floor(window.innerHeight / 62);
     const totalPlots = plotsX * plotsY;
@@ -57,7 +53,6 @@ function generateGardenGrid() {
     }
 }
 
-// --- TASK MANAGEMENT ---
 function plantSeed() {
     const input = document.getElementById('taskInput');
     const name = input.value.trim();
@@ -123,7 +118,6 @@ function deleteSeed(id) {
     renderTasks();
 }
 
-// --- TIMER & GROWTH ---
 function openTimer(id, name) {
     const task = state.activeTasks.find(t => t.id === id);
     if (!task) return;
@@ -172,7 +166,6 @@ function finishGrowth(secWorked) {
     timerId = null;
     state.totalSeconds += secWorked;
 
-    // Pick a random prize from the expanded pool
     const prize = rewardPool[Math.floor(Math.random() * rewardPool.length)];
 
     const plotId = currentTaskRef.plotId;
@@ -194,7 +187,6 @@ function finishGrowth(secWorked) {
     document.getElementById('dynamicWave').style.animationDuration = "10s"; 
 }
 
-// --- UI  FUNCTIONS ---
 function renderUI() {
     const h = Math.floor(state.totalSeconds / 3600);
     const m = Math.floor((state.totalSeconds % 3600) / 60);
